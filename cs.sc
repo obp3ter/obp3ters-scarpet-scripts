@@ -27,12 +27,9 @@ _spectator() -> (
     global_gm=query(player,'gamemode');
 
     task( _() -> (
-    if(_exec_os_or_powershell('ls '+get_save_dir()) == null,
-        _exec_os_or_powershell('mkdir '+get_save_dir());
-    );
 
-    _exec_os_or_powershell(
-        'echo \''+
+
+    write_file(player()~'name', 'text',
         global_x+';'+
         global_y+';'+
         global_z+';'+
@@ -40,7 +37,7 @@ _spectator() -> (
         global_pitch+';'+
         global_dim+';'+
         global_gm+
-        ';\' > '+get_save_dir() +'/'+player()~'name'+'.txt');
+        ';');
     ));
 
     run('gamemode spectator '+player);
@@ -52,22 +49,15 @@ _back_to_normal() -> (
     player=player();
 
     if(global_dim==0,
-    ret_val = _exec_os_or_powershell('cat '+get_save_dir() +'/'+player~'name'+'.txt');
+    ret_val = read_file(player~'name', 'text');
     if(ret_val == null,return(););
-    ret_values = split(';',ret_val);
+    ret_values = split(';',ret_val:0);
     run('gamemode '+ret_values:6+' '+player);
     run('execute in '+ret_values:5+' run tp '+player+' '+ret_values:0+' '+ret_values:1+' '+ret_values:2+' '+ret_values:3+' '+ret_values:4);
     ,//else
     run('gamemode '+global_gm+' '+player);
     run('execute in '+global_dim+' run tp '+player+' '+global_x+' '+global_y+' '+global_z+' '+global_yaw+' '+global_pitch);
     );
-    task( _() -> _exec_os_or_powershell('rm '+get_save_dir() +'/'+player~'name'+'.txt'));
+    delete_file(player~'name', 'text');
     return();
-);
-
-_exec_os_or_powershell(command) -> (
-    if(get_os() == 'Linux',
-        os_exec(command);,
-        powershell_exec(command);
-    );
 );
