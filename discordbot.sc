@@ -7,7 +7,7 @@ get_world_name_by_folder() -> (return(split('/',system_info('world_path')):(-2))
 __on_discord_message(message) -> (
     if(message~'user'~'is_self',
 
-		if(slice(message~'content',0,1)=='<' && split('>',split('@',message~'content'):1):0 != get_world_name_by_folder(),
+		if(message~'readable_content' != '' && slice(message~'readable_content',0,1)=='<' && split('>',split('@',message~'readable_content'):1):0 != get_world_name_by_folder(),
 			run('tellraw @a {"text":"' + replace(message~'readable_content','\n','\\\\n') + '", "color":"white"}');
   		);
   		return();
